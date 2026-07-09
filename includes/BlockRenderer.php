@@ -14,7 +14,13 @@ class BlockRenderer {
 	 * @return string
 	 */
 	public static function render( $attributes, $content, $block ): string {
-		$slug = Anchors::get_slug_from_attributes( $attributes );
+		$current_post = get_post();
+
+		if ( $current_post instanceof \WP_Post ) {
+			$slug = Anchors::get_unique_slug_for_anchor_render( $current_post, $attributes );
+		} else {
+			$slug = Anchors::get_slug_from_attributes( $attributes );
+		}
 
 		if ( empty( $slug ) ) {
 			return '';

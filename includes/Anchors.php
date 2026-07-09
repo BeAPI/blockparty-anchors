@@ -7,6 +7,13 @@ class Anchors {
 	private const CACHE_GROUP = 'blockparty-anchors-list';
 
 	/**
+	 * Tracks the next anchor index to resolve during frontend rendering.
+	 *
+	 * @var array<int, int>
+	 */
+	private static array $anchor_render_indexes = [];
+
+	/**
 	 * Register plugin hooks.
 	 *
 	 * @return void
@@ -46,11 +53,37 @@ class Anchors {
 	}
 
 	/**
+	 * Ensure a slug is unique among anchors already assigned on the page.
+	 *
+	 * @param string              $slug           Candidate slug.
+	 * @param array<string, true> $assigned_slugs Slugs already assigned.
+	 *
+	 * @return string
+	 */
+	private static function make_unique_slug( string $slug, array &$assigned_slugs ): string {
+		if ( empty( $slug ) ) {
+			return '';
+		}
+
+		$unique_slug = $slug;
+		$suffix      = 2;
+
+		while ( isset( $assigned_slugs[ $unique_slug ] ) ) {
+			$unique_slug = $slug . '-' . $suffix;
+			++$suffix;
+		}
+
+		$assigned_slugs[ $unique_slug ] = true;
+
+		return $unique_slug;
+	}
+
+	/**
 	 * Return anchor blocks from post content.
 	 *
 	 * @param \WP_Post $post Post object.
 	 *
-	 * @return array<string, string> Slug => title map.
+	 * @return array<int, array{slug: string, title: string}> Ordered anchors.
 	 */
 	public static function get_from_post( \WP_Post $post ): array {
 		$found = false;
@@ -60,8 +93,9 @@ class Anchors {
 			return $data;
 		}
 
-		$anchors_data = [];
-		self::collect_from_blocks( parse_blocks( $post->post_content ), $anchors_data );
+		$anchors_data   = [];
+		$assigned_slugs = [];
+		self::collect_from_blocks( parse_blocks( $post->post_content ), $anchors_data, $assigned_slugs );
 
 		wp_cache_set( $post->ID, $anchors_data, self::CACHE_GROUP );
 
@@ -69,14 +103,43 @@ class Anchors {
 	}
 
 	/**
+	 * Resolve the unique slug for the next anchor block rendered on the frontend.
+	 *
+	 * Anchor blocks are rendered in document order, so a per-post render index can
+	 * map each instance to the slug computed during collection.
+	 *
+	 * @param \WP_Post $post       Post object.
+	 * @param array    $attributes Block attributes.
+	 *
+	 * @return string
+	 */
+	public static function get_unique_slug_for_anchor_render( \WP_Post $post, array $attributes ): string {
+		$anchors = self::get_from_post( $post );
+		$post_id = $post->ID;
+
+		if ( ! isset( self::$anchor_render_indexes[ $post_id ] ) ) {
+			self::$anchor_render_indexes[ $post_id ] = 0;
+		}
+
+		$index = self::$anchor_render_indexes[ $post_id ]++;
+
+		if ( isset( $anchors[ $index ] ) ) {
+			return $anchors[ $index ]['slug'];
+		}
+
+		return self::get_slug_from_attributes( $attributes );
+	}
+
+	/**
 	 * Recursively collect anchors from parsed blocks.
 	 *
-	 * @param array              $blocks       Parsed blocks.
-	 * @param array<string,string> $anchors_data Collected anchors.
+	 * @param array              $blocks         Parsed blocks.
+	 * @param array<int, array{slug: string, title: string}> $anchors_data   Collected anchors.
+	 * @param array<string, true> $assigned_slugs Slugs already assigned.
 	 *
 	 * @return void
 	 */
-	private static function collect_from_blocks( array $blocks, array &$anchors_data ): void {
+	private static function collect_from_blocks( array $blocks, array &$anchors_data, array &$assigned_slugs ): void {
 		foreach ( $blocks as $block ) {
 			if ( 'blockparty/anchor' === ( $block['blockName'] ?? '' ) ) {
 				$attrs = wp_parse_args(
@@ -90,12 +153,15 @@ class Anchors {
 				$slug = self::get_slug_from_attributes( $attrs );
 
 				if ( ! empty( $attrs['title'] ) && ! empty( $slug ) ) {
-					$anchors_data[ $slug ] = $attrs['title'];
+					$anchors_data[] = [
+						'slug'  => self::make_unique_slug( $slug, $assigned_slugs ),
+						'title' => $attrs['title'],
+					];
 				}
 			}
 
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				self::collect_from_blocks( $block['innerBlocks'], $anchors_data );
+				self::collect_from_blocks( $block['innerBlocks'], $anchors_data, $assigned_slugs );
 			}
 		}
 	}

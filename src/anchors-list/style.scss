@@ -1,0 +1,46 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-blockparty-anchors-list {
+	--wp-block-anchors-list--scroll-margin-top: var(--wp-admin--admin-bar--height, 0px);
+	--wp-block-anchors-list--display: flex;
+	--wp-block-anchors-list--flex-direction: row;
+	--wp-block-anchors-list--justify-content: flex-start;
+	--wp-block-anchors-list--align-items: center;
+	--wp-block-anchors-list--gap: 0.5em;
+	--wp-block-anchors-list--flex-wrap: nowrap;
+	--wp-block-anchors-list--padding-inline: 0;
+	--wp-block-anchors-list--list-style: none;
+
+	&__title {
+		border: 0 !important;
+		clip: rect(1px, 1px, 1px, 1px) !important;
+		-webkit-clip-path: inset(50%) !important;
+				clip-path: inset(50%) !important;
+		height: 1px !important;
+		overflow: hidden !important;
+		padding: 0 !important;
+		position: absolute !important;
+		width: 1px !important;
+		white-space: nowrap !important;
+	}
+
+	&__items {
+		display: var(--wp-block-anchors-list--display);
+		flex-direction: var(--wp-block-anchors-list--flex-direction);
+		justify-content: var(--wp-block-anchors-list--justify-content);
+		align-items: var(--wp-block-anchors-list--align-items);
+		gap: var(--wp-block-anchors-list--gap);
+		flex-wrap: var(--wp-block-anchors-list--flex-wrap);
+		list-style: var(--wp-block-anchors-list--list-style);
+		padding-inline: var(--wp-block-anchors-list--padding-inline);
+	}
+
+	&__link {
+		scroll-margin-top: var(--wp-block-anchors-list--scroll-margin-top);
+	}
+}

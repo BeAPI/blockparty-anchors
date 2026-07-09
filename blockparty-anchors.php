@@ -4,7 +4,7 @@
  * Description:       Adds two new blocks to the WordPress editor: an anchor block to create an anchor system on your pages, and an anchor list block to list those anchors.
  * Version:           1.0.0
  * Requires at least: 6.8
- * Requires PHP:      7.4
+ * Requires PHP:      8.1
  * Author:            Be API Technical Team
  * Author URI:        https://beapi.fr
  * License:           GPL-2.0-or-later

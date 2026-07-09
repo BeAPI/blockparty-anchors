@@ -25,7 +25,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-element/
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Utility to build slugs from titles.
@@ -87,6 +87,52 @@ const getAnchorSlug = ( attributes ) =>
 	attributes.slug || buildSlugFromTitle( attributes.title || '' );
 
 /**
+ * Ensure a slug is unique among anchors already assigned on the page.
+ *
+ * Mirrors server-side Anchors::make_unique_slug() so editor hrefs match frontend output.
+ *
+ * @param {string}               slug          Candidate slug.
+ * @param {Record<string, true>} assignedSlugs Slugs already assigned.
+ *
+ * @return {string} Unique slug.
+ */
+const makeUniqueSlug = ( slug, assignedSlugs ) => {
+	if ( ! slug ) {
+		return '';
+	}
+
+	let uniqueSlug = slug;
+	let suffix = 2;
+
+	while ( assignedSlugs[ uniqueSlug ] ) {
+		uniqueSlug = `${ slug }-${ suffix }`;
+		suffix += 1;
+	}
+
+	assignedSlugs[ uniqueSlug ] = true;
+
+	return uniqueSlug;
+};
+
+/**
+ * Resolve the unique slug for an anchor block in document order.
+ *
+ * @param {Object}               attributes    Anchor block attributes.
+ * @param {Record<string, true>} assignedSlugs Slugs already assigned.
+ *
+ * @return {string} Unique anchor slug.
+ */
+const getUniqueAnchorSlug = ( attributes, assignedSlugs ) => {
+	const slug = getAnchorSlug( attributes );
+
+	if ( ! slug ) {
+		return '';
+	}
+
+	return makeUniqueSlug( slug, assignedSlugs );
+};
+
+/**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.
  *
@@ -102,6 +148,15 @@ export default function Edit() {
 	}, [] );
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+
+	const anchorsWithSlugs = useMemo( () => {
+		const assignedSlugs = {};
+
+		return anchorBlocks.map( ( block ) => ( {
+			block,
+			slug: getUniqueAnchorSlug( block.attributes, assignedSlugs ),
+		} ) );
+	}, [ anchorBlocks ] );
 
 	const onChangeAnchor = useCallback(
 		( clientId, title ) => {
@@ -124,18 +179,16 @@ export default function Edit() {
 					{ __( 'Quick access', 'blockparty-anchors' ) }
 				</div>
 				<div className="wp-block-blockparty-anchors-list__scroll">
-					{ anchorBlocks.length ? (
+					{ anchorsWithSlugs.length ? (
 						<ul className="wp-block-blockparty-anchors-list__items no-list-style">
-							{ anchorBlocks.map( ( block ) => (
+							{ anchorsWithSlugs.map( ( { block, slug } ) => (
 								<li
 									key={ block.clientId }
 									className="wp-block-blockparty-anchors-list__item"
 								>
 									<a
 										className="wp-block-blockparty-anchors-list__link"
-										href={ `#${ getAnchorSlug(
-											block.attributes
-										) }` }
+										href={ slug ? `#${ slug }` : '#' }
 										onClick={ ( event ) =>
 											event.preventDefault()
 										}

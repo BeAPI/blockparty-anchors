@@ -20,6 +20,7 @@ class Anchors {
 	 */
 	public static function register_hooks(): void {
 		add_action( 'clean_post_cache', [ self::class, 'clear_post_cache' ] );
+		add_filter( 'pre_do_blocks', [ self::class, 'reset_anchor_render_indexes_for_current_post' ], 0 );
 	}
 
 	/**
@@ -31,6 +32,24 @@ class Anchors {
 	 */
 	public static function clear_post_cache( int $post_id ): void {
 		wp_cache_delete( $post_id, self::CACHE_GROUP );
+		unset( self::$anchor_render_indexes[ $post_id ] );
+	}
+
+	/**
+	 * Reset per-post anchor render indexes before each block rendering pass.
+	 *
+	 * @param string $content Post content about to be parsed by do_blocks().
+	 *
+	 * @return string Unchanged content.
+	 */
+	public static function reset_anchor_render_indexes_for_current_post( string $content ): string {
+		$post = get_post();
+
+		if ( $post instanceof \WP_Post ) {
+			unset( self::$anchor_render_indexes[ $post->ID ] );
+		}
+
+		return $content;
 	}
 
 	/**
@@ -79,13 +98,13 @@ class Anchors {
 	}
 
 	/**
-	 * Return anchor blocks from post content.
+	 * Load every anchor block from post content in document order.
 	 *
 	 * @param \WP_Post $post Post object.
 	 *
 	 * @return array<int, array{slug: string, title: string}> Ordered anchors.
 	 */
-	public static function get_from_post( \WP_Post $post ): array {
+	private static function load_anchors_from_post( \WP_Post $post ): array {
 		$found = false;
 		$data  = wp_cache_get( $post->ID, self::CACHE_GROUP, false, $found );
 
@@ -103,6 +122,26 @@ class Anchors {
 	}
 
 	/**
+	 * Return anchors suitable for the quick-access navigation list.
+	 *
+	 * @param \WP_Post $post Post object.
+	 *
+	 * @return array<int, array{slug: string, title: string}> Ordered anchors.
+	 */
+	public static function get_from_post( \WP_Post $post ): array {
+		$anchors = self::load_anchors_from_post( $post );
+
+		return array_values(
+			array_filter(
+				$anchors,
+				static function ( array $anchor ): bool {
+					return ! empty( $anchor['title'] ) && ! empty( $anchor['slug'] );
+				}
+			)
+		);
+	}
+
+	/**
 	 * Resolve the unique slug for the next anchor block rendered on the frontend.
 	 *
 	 * Anchor blocks are rendered in document order, so a per-post render index can
@@ -114,7 +153,7 @@ class Anchors {
 	 * @return string
 	 */
 	public static function get_unique_slug_for_anchor_render( \WP_Post $post, array $attributes ): string {
-		$anchors = self::get_from_post( $post );
+		$anchors = self::load_anchors_from_post( $post );
 		$post_id = $post->ID;
 
 		if ( ! isset( self::$anchor_render_indexes[ $post_id ] ) ) {
@@ -152,12 +191,10 @@ class Anchors {
 
 				$slug = self::get_slug_from_attributes( $attrs );
 
-				if ( ! empty( $attrs['title'] ) && ! empty( $slug ) ) {
-					$anchors_data[] = [
-						'slug'  => self::make_unique_slug( $slug, $assigned_slugs ),
-						'title' => $attrs['title'],
-					];
-				}
+				$anchors_data[] = [
+					'slug'  => ! empty( $slug ) ? self::make_unique_slug( $slug, $assigned_slugs ) : '',
+					'title' => (string) $attrs['title'],
+				];
 			}
 
 			if ( ! empty( $block['innerBlocks'] ) ) {

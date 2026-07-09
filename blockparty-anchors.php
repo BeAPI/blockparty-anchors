@@ -56,7 +56,7 @@ function init() {
 	);
 
 	wp_set_script_translations(
-		'blockparty-anchors-editor-script',
+		'blockparty-anchor-editor-script',
 		'blockparty-anchors',
 		BLOCKPARTY_ANCHORS_DIR . 'languages'
 	);

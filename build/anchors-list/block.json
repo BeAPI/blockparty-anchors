@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockparty/anchors-list",
+  "version": "1.0.0",
+  "title": "Anchors List",
+  "category": "widgets",
+  "description": "Displays the list of anchors placed on your page.",
+  "attributes": {
+    "slug": {
+      "default": "",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "example": {
+    "attributes": {
+      "title": "My anchor",
+      "slug": "my-anchor"
+    }
+  },
+  "supports": {
+    "color": {
+      "background": true,
+      "link": true,
+      "text": true
+    },
+    "html": false,
+    "multiple": false,
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "fontStyle": true,
+      "fontWeight": true,
+      "letterSpacing": true,
+      "lineHeight": true,
+      "textTransform": true,
+      "fontFamily": true
+    }
+  },
+  "textdomain": "blockparty-anchors",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}

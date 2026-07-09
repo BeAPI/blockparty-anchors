@@ -1,0 +1,32 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/blockparty-anchors-demo/",
+	"preferredVersions": {
+		"php": "8.1",
+		"wp": "latest"
+	},
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "git:directory",
+				"url": "https://github.com/BeAPI/blockparty-anchors",
+				"ref": "1.0.0",
+				"refType": "tag"
+			},
+			"options": {
+				"activate": true,
+				"targetFolderName": "blockparty-anchors"
+			}
+		},
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php\nrequire_once 'wordpress/wp-load.php';\n$post_content = <<<'BLOCKPARTY_ANCHORS_MARKUP_EOF'\n<!-- wp:paragraph -->\n<p>Use the quick access list below to jump to each section of this page.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:spacer {\"height\":\"var:preset|spacing|40\"} -->\n<div style=\"height:var(--wp--preset--spacing--40)\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer -->\n\n<!-- wp:blockparty/anchors-list /-->\n\n<!-- wp:spacer {\"height\":\"var:preset|spacing|50\"} -->\n<div style=\"height:var(--wp--preset--spacing--50)\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Introduction</h2>\n<!-- /wp:heading -->\n\n<!-- wp:blockparty/anchor {\"title\":\"Introduction\",\"slug\":\"introduction\"} /-->\n\n<!-- wp:paragraph -->\n<p>Blockparty Anchors lets editors place invisible anchor points on a page and display a linked navigation list for quick access.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:spacer {\"height\":\"var:preset|spacing|50\"} -->\n<div style=\"height:var(--wp--preset--spacing--50)\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">How it works</h2>\n<!-- /wp:heading -->\n\n<!-- wp:blockparty/anchor {\"title\":\"How it works\",\"slug\":\"how-it-works\"} /-->\n\n<!-- wp:paragraph -->\n<p>Add <strong>Anchor</strong> blocks where you want navigation targets, then insert an <strong>Anchors List</strong> block to build a table of contents automatically.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><li>Edit anchor labels directly in the editor</li><li>Slugs are generated automatically from titles</li><li>Override the HTML id from the block sidebar when needed</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:spacer {\"height\":\"var:preset|spacing|50\"} -->\n<div style=\"height:var(--wp--preset--spacing--50)\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Try it</h2>\n<!-- /wp:heading -->\n\n<!-- wp:blockparty/anchor {\"title\":\"Try it\",\"slug\":\"try-it\"} /-->\n\n<!-- wp:paragraph -->\n<p>Click a link in the anchors list above to scroll to this section. You can also edit this page in the block editor to add more anchors.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph {\"align\":\"right\",\"fontSize\":\"small\"} -->\n<p class=\"has-text-align-right has-small-font-size\">Developed by <a href=\"https://beapi.fr\">Be API</a></p>\n<!-- /wp:paragraph -->\nBLOCKPARTY_ANCHORS_MARKUP_EOF;\n\n$post_id = wp_insert_post(\n\tarray(\n\t\t'post_title'   => 'Blockparty Anchors',\n\t\t'post_name'    => 'blockparty-anchors-demo',\n\t\t'post_content' => $post_content,\n\t\t'post_status'  => 'publish',\n\t\t'post_type'    => 'page',\n\t)\n);\necho 'Page created with ID: ' . $post_id;\n?>"
+		}
+	]
+}

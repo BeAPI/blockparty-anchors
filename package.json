@@ -1,0 +1,39 @@
+{
+	"name": "blockparty-anchors",
+	"version": "1.0.0",
+	"description": "Adds two new blocks to the WordPress editor: an anchor block to create an anchor system on your pages, and an anchor list block to list those anchors.",
+	"author": "Be API",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --blocks-manifest",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"make-pot": "wp i18n make-pot . languages/blockparty-anchors.pot --exclude=\"src\" --domain=blockparty-anchors",
+		"make-json": "wp i18n make-json languages/blockparty-anchors-fr_FR.po languages/ --no-purge",
+		"start": "wp-scripts start --blocks-manifest",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop"
+	},
+	"dependencies": {
+		"@beapi/icons": "1.2.7",
+		"@wordpress/block-editor": "latest",
+		"@wordpress/blocks": "latest",
+		"@wordpress/components": "latest",
+		"@wordpress/data": "latest",
+		"@wordpress/element": "latest",
+		"@wordpress/i18n": "latest",
+		"@wordpress/icons": "latest",
+		"@wordpress/url": "latest"
+	},
+	"devDependencies": {
+		"@wordpress/env": "latest",
+		"@wordpress/scripts": "^32.4.1"
+	},
+	"volta": {
+		"node": "24.18.0"
+	}
+}

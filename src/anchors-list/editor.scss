@@ -1,0 +1,16 @@
+/**
+ * Editor-only styles for the anchors list block.
+ */
+
+.wp-block-blockparty-anchors-list {
+	.anchor-list__empty {
+		margin: 0;
+		color: #757575;
+		font-style: italic;
+	}
+
+	.anchor-list__item .rich-text {
+		display: inline-block;
+		min-width: 1em;
+	}
+}

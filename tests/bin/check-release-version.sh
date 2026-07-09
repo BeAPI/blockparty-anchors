@@ -50,8 +50,8 @@ fi
 NEW_VER=$(jq -r .version .plugin-data)
 
 if ! git cat-file -e "${BASE_SHA}:.plugin-data" 2>/dev/null; then
-	echo "::error::Could not read .plugin-data at merge base. Ensure the base branch has .plugin-data."
-	exit 1
+	echo "No .plugin-data at merge base. Skipping release and tag checks."
+	exit 0
 fi
 
 OLD_VER=$(git show "${BASE_SHA}:.plugin-data" | jq -r .version)
@@ -76,7 +76,7 @@ missing=()
 for f in \
 	.plugin-data \
 	package.json \
-	blockparty-modal.php \
+	blockparty-anchors.php \
 	readme.txt \
 	.wordpress-org/blueprints/blueprint.json \
 	CHANGELOG.md

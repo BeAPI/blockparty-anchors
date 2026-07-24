@@ -90,7 +90,7 @@ while IFS= read -r -d '' f; do
 	if ! have_diff "$f"; then
 		missing+=("$f (block.json)")
 	fi
-done < <(find . -name block.json -not -path '*/node_modules/*' -not -path '*/vendor/*' -print0 2>/dev/null)
+done < <(find . -name block.json -not -path '*/node_modules/*' -not -path '*/vendor/*' -not -path '*/build/*' -print0 2>/dev/null)
 
 if [ ${#missing[@]} -ne 0 ]; then
 	echo "::error::This PR bumps the plugin version. The following required paths must be modified (diff vs base branch):"
@@ -110,7 +110,7 @@ while IFS= read -r -d '' f; do
 		echo "::error::${f} version must equal ${NEW_VER} (from .plugin-data)"
 		fail=1
 	fi
-done < <(find . -name block.json -not -path '*/node_modules/*' -not -path '*/vendor/*' -print0 2>/dev/null)
+done < <(find . -name block.json -not -path '*/node_modules/*' -not -path '*/vendor/*' -not -path '*/build/*' -print0 2>/dev/null)
 
 BP_REF=$(jq -r '.steps[] | select(.pluginData) | .pluginData.ref' .wordpress-org/blueprints/blueprint.json | head -1)
 if [ "$BP_REF" != "$NEW_VER" ]; then
@@ -118,13 +118,13 @@ if [ "$BP_REF" != "$NEW_VER" ]; then
 	fail=1
 fi
 
-if ! grep -F "* Version:" blockparty-modal.php | head -1 | grep -qF "$NEW_VER"; then
-	echo "::error::blockparty-modal.php plugin header Version must be ${NEW_VER}"
+if ! grep -F "* Version:" blockparty-anchors.php | head -1 | grep -qF "$NEW_VER"; then
+	echo "::error::blockparty-anchors.php plugin header Version must be ${NEW_VER}"
 	fail=1
 fi
 
-if ! grep -qF "define( 'BLOCKPARTY_MODAL_VERSION', '$NEW_VER' );" blockparty-modal.php; then
-	echo "::error::blockparty-modal.php define BLOCKPARTY_MODAL_VERSION must be '${NEW_VER}'"
+if ! grep -qF "define( 'BLOCKPARTY_ANCHORS_VERSION', '$NEW_VER' );" blockparty-anchors.php; then
+	echo "::error::blockparty-anchors.php define BLOCKPARTY_ANCHORS_VERSION must be '${NEW_VER}'"
 	fail=1
 fi
 
@@ -138,8 +138,8 @@ if ! grep -qF "= ${NEW_VER} =" readme.txt; then
 	fail=1
 fi
 
-if ! grep -qF "$NEW_VER" CHANGELOG.md; then
-	echo "::error::CHANGELOG.md must mention the release version ${NEW_VER} (e.g. a [${NEW_VER}] section header)"
+if ! grep -qE "^##[[:space:]]+${NEW_VER}([[:space:]]|$)" CHANGELOG.md; then
+	echo "::error::CHANGELOG.md must include a '## ${NEW_VER}' section header"
 	fail=1
 fi
 

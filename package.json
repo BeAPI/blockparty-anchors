@@ -1,6 +1,6 @@
 {
 	"name": "blockparty-anchors",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Adds two new blocks to the WordPress editor: an anchor block to create an anchor system on your pages, and an anchor list block to list those anchors.",
 	"author": "Be API",
 	"license": "GPL-2.0-or-later",

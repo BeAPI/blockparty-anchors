@@ -2,9 +2,13 @@ name: PHP Quality Checks
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
   push:
     branches:
       - main
+      - develop
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -20,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

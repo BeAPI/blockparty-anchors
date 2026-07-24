@@ -54,14 +54,19 @@ class Anchors {
 	 * Skips nested the_content calls from blocks such as core/post-content inside
 	 * an FSE template, so template + post anchors keep a single document order.
 	 *
+	 * Note: `render_block` is applied after a dynamic block's render_callback
+	 * returns, so it is never on wp_current_filter while core/post-content runs
+	 * apply_filters( 'the_content' ). Detect nesting via the block currently
+	 * being rendered instead.
+	 *
 	 * @param string $content Post content.
 	 *
 	 * @return string Unchanged content.
 	 */
 	public static function maybe_reset_anchor_render_indexes_on_the_content( string $content ): string {
-		$current_filters = $GLOBALS['wp_current_filter'] ?? [];
-
-		if ( in_array( 'render_block', $current_filters, true ) ) {
+		// WP_Block::render() sets this around render_callback; empty for top-level
+		// classic the_content (priority 0 runs before do_blocks).
+		if ( class_exists( '\WP_Block_Supports' ) && ! empty( \WP_Block_Supports::$block_to_render ) ) {
 			return $content;
 		}
 

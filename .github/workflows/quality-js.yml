@@ -9,14 +9,6 @@ on:
       - 'src/**'
       - 'package.json'
       - 'package-lock.json'
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:

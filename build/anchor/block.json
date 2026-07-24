@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockparty/anchor",
+  "version": "1.0.1",
+  "title": "Anchor",
+  "category": "widgets",
+  "description": "Place an anchor on your page. It will be listed in the anchor list block.",
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "example": {
+    "attributes": {
+      "title": "My anchor",
+      "slug": "my-anchor"
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "textdomain": "blockparty-anchors",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}

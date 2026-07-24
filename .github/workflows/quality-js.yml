@@ -2,15 +2,21 @@ name: Javascript Quality Checks
 
 on:
   pull_request:
-      paths:
-          - 'src/**'
-          - 'package.json'
-  push:
-      paths:
-          - 'src/**'
-          - 'package.json'
-      branches:
+    branches:
       - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -26,12 +32,13 @@ jobs:
 
     steps:
       - name: Checkout project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-            node-version-file: 'package.json'
+          node-version-file: 'package.json'
+          cache: 'npm'
 
       - name: Install npm dependencies
         run: npm ci

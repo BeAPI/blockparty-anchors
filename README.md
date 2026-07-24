@@ -309,10 +309,7 @@ This plugin is distributed under the GPL-2.0-or-later license.
 
 ## 📝 Changelog
 
-See [readme.txt](readme.txt) for the full version history. Recent highlights:
-
-- **1.0.0**
-  - Initial release with Anchor and Anchors List blocks, dynamic PHP rendering, theme template overrides, editor synchronization, and French translations.
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ---
 

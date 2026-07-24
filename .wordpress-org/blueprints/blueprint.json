@@ -11,7 +11,7 @@
 			"pluginData": {
 				"resource": "git:directory",
 				"url": "https://github.com/BeAPI/blockparty-anchors",
-				"ref": "1.0.0",
+				"ref": "1.0.1",
 				"refType": "tag"
 			},
 			"options": {

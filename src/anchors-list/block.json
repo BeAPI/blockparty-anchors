@@ -29,6 +29,9 @@
 		},
 		"html": false,
 		"multiple": false,
+		"position": {
+			"sticky": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -46,5 +49,6 @@
 	"textdomain": "blockparty-anchors",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
+	"viewScript": "file:./view.js",
 	"style": "file:./style-index.css"
 }

@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "blockparty/anchors-list",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"title": "Anchors List",
 	"category": "widgets",
 	"description": "Displays the list of anchors placed on your page.",
@@ -29,6 +29,9 @@
 		},
 		"html": false,
 		"multiple": false,
+		"position": {
+			"sticky": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -46,5 +49,6 @@
 	"textdomain": "blockparty-anchors",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
+	"viewScript": "file:./view.js",
 	"style": "file:./style-index.css"
 }

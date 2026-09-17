@@ -16,6 +16,8 @@
 
 namespace Blockparty\Anchors;
 
+use Blockparty\Anchors\Cli\MigrateFromAnchorBlockCommand;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -69,3 +71,7 @@ function init() {
 }
 
 add_action( 'init', __NAMESPACE__ . '\\init', 0 );
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'blockparty-anchors migrate-from-anchor-block', MigrateFromAnchorBlockCommand::class );
+}

@@ -107,31 +107,36 @@ class MigrateFromAnchorBlockCommand extends WP_CLI_Command {
 				$before_skipped  = $migrator->skipped;
 				$new_content     = $migrator->migrate_content( $post->post_content );
 
-				$delta_migrated  = $migrator->migrated - $before_migrated;
-				$delta_skipped   = $migrator->skipped - $before_skipped;
-				$total_migrated += $delta_migrated;
-				$total_skipped  += $delta_skipped;
+				$delta_migrated = $migrator->migrated - $before_migrated;
+				$delta_skipped  = $migrator->skipped - $before_skipped;
 
 				if ( null === $new_content ) {
 					continue;
 				}
 
+				$label = '[dry-run]';
+				if ( ! $dry_run ) {
+					$status = $this->persist_post_content( (int) $post->ID, $new_content );
+					if ( '' === $status ) {
+						continue;
+					}
+					$label = '[' . $status . ']';
+				}
+
+				$total_migrated += $delta_migrated;
+				$total_skipped  += $delta_skipped;
 				++$posts_updated;
 
 				WP_CLI::log(
 					sprintf(
 						'%1$s post %2$d (%3$s) — blocks migrated: %4$d, skipped: %5$d',
-						$dry_run ? '[dry-run]' : '[update]',
+						$label,
 						(int) $post->ID,
 						$post->post_type,
 						$delta_migrated,
 						$delta_skipped
 					)
 				);
-
-				if ( ! $dry_run ) {
-					$this->persist_post_content( (int) $post->ID, $post->post_type, $new_content, $delta_migrated, $delta_skipped );
-				}
 			}
 
 			++$page;
@@ -153,14 +158,11 @@ class MigrateFromAnchorBlockCommand extends WP_CLI_Command {
 	/**
 	 * Save migrated content, with a content-only fallback for orphaned page templates.
 	 *
-	 * @param int    $post_id         Post ID.
-	 * @param string $post_type       Post type.
-	 * @param string $new_content     Unslashed post content.
-	 * @param int    $delta_migrated  Blocks migrated for this post.
-	 * @param int    $delta_skipped   Blocks skipped for this post.
-	 * @return void
+	 * @param int    $post_id     Post ID.
+	 * @param string $new_content Unslashed post content.
+	 * @return string Empty on failure, `update` or `update-fallback` on success.
 	 */
-	private function persist_post_content( int $post_id, string $post_type, string $new_content, int $delta_migrated, int $delta_skipped ): void {
+	private function persist_post_content( int $post_id, string $new_content ): string {
 		// wp_update_post() expects slashed data; without wp_slash(),
 		// block comment escapes like \u002d (for "--") become bare "u002d".
 		$updated = wp_update_post(
@@ -172,24 +174,11 @@ class MigrateFromAnchorBlockCommand extends WP_CLI_Command {
 		);
 
 		if ( ! is_wp_error( $updated ) ) {
-			return;
+			return 'update';
 		}
 
-		if ( 'invalid_page_template' === $updated->get_error_code() ) {
-			$fallback_ok = $this->update_post_content_fallback( $post_id, $new_content );
-
-			if ( $fallback_ok ) {
-				WP_CLI::log(
-					sprintf(
-						'[update-fallback] post %1$d (%2$s) — blocks migrated: %3$d, skipped: %4$d',
-						$post_id,
-						$post_type,
-						$delta_migrated,
-						$delta_skipped
-					)
-				);
-				return;
-			}
+		if ( 'invalid_page_template' === $updated->get_error_code() && $this->update_post_content_fallback( $post_id, $new_content ) ) {
+			return 'update-fallback';
 		}
 
 		WP_CLI::warning(
@@ -199,6 +188,8 @@ class MigrateFromAnchorBlockCommand extends WP_CLI_Command {
 				$updated->get_error_message()
 			)
 		);
+
+		return '';
 	}
 
 	/**

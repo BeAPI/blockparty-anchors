@@ -4,7 +4,7 @@ Tags:              block, gutenberg, anchor, navigation, table of contents
 Requires at least: 6.8
 Tested up to:      6.8
 Requires PHP:      8.1
-Stable tag:        1.0.2
+Stable tag:        1.0.3
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -95,6 +95,9 @@ Yes. Anchor blocks are collected recursively, including when placed inside colum
 3. Frontend quick-access navigation with in-page links
 
 == Changelog ==
+
+= 1.0.3 =
+* Add WP-CLI command migrate-from-anchor-block to convert legacy beapi/anchor and beapi/anchor-list blocks to Blockparty Anchors, with MIGRATION.md documentation.
 
 = 1.0.2 =
 * Add frontend scroll-spy on the Anchors List block, with an is-active state, smooth in-page scrolling, URL hash sync, and sticky position support.
